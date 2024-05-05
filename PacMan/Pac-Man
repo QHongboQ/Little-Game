@@ -1,0 +1,170 @@
+#include <iostream>
+#include <conio.h>
+#include <sstream>
+#include<windows.h>
+
+using namespace std;
+
+bool gameOver;
+const int width = 40;
+const int height = 20;
+int x, y, ballX, ballY, score;
+string player;
+int paddle1X, paddle1Y, paddle2X, paddle2Y;
+enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
+eDirection ballDir;
+
+void Setup()
+{
+    gameOver = false;
+    ballDir = STOP;
+    x = width / 2;
+    y = height / 2;
+    ballX = rand() % width;
+    ballY = rand() % height;
+    score = 0;
+    paddle1Y = height / 2;
+    paddle2Y = height / 2;
+    paddle1X = 0;
+    paddle2X = width - 1;
+}
+
+void Draw()
+{
+    stringstream wall;
+
+    wall << "Score: " << score <<endl;
+
+    for (int i = 0; i < width + 2; i++)
+    {
+        wall << "#";
+    }
+    wall << "\n";
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if (j == 0)
+                wall << "#";
+
+            if (i == y && j == x)
+                wall << player;
+            else if (i == ballY && j == ballX)
+                wall << "o";
+            else
+                wall << " ";
+
+            if (j == width - 1)
+                wall << "#";
+        }
+        wall << "\n";
+    }
+
+    for (int i = 0; i < width + 2; i++)
+    {
+        wall << "#";
+    }
+    wall << "\n";
+
+    system("cls");
+    cout << wall.str();
+}
+
+void Input()
+{
+    if(_kbhit())
+    {
+        switch (_getch())
+        {
+        case 'w':
+            ballDir = UP;
+            player = "X";
+            break;
+
+        case 'a':
+            ballDir = LEFT;
+            player = "X";
+            break;
+
+        case 's':
+            ballDir = DOWN;
+            player = "X";
+            break;
+        
+        case 'd':
+            ballDir = RIGHT;
+            player = "X";
+            break;
+
+        case 'x':
+            gameOver = true;
+            break;
+        
+        
+        default:
+            break;
+        }
+    }
+}
+
+void Logic()
+{
+    switch (ballDir)
+    {
+    case STOP:
+        break;
+    case UP:
+        if (y > 0)
+            y--;
+        else
+            y = height - 1; 
+        break;
+    case DOWN:
+        if (y < height - 1)
+            y++;
+        else
+            y = 0;  
+        break;
+    case RIGHT:
+        if (x < width - 1)
+            x++;
+        else
+            x = 0;  
+        break;
+    case LEFT:
+        if (x > 0)
+            x--;
+        else
+            x = width - 1; 
+        break;
+    default:
+        break;
+    }
+
+    
+    if (x == ballX && y == ballY)
+    {
+        score++;
+        do {
+            ballX = rand() % width;
+            ballY = rand() % height;
+        } while (ballX == x && ballY == y); 
+    }
+}
+
+int main()
+{
+    Setup();
+
+    while (!gameOver)
+    {
+        Draw();
+        Input();
+        Logic();
+        Sleep(100);
+    }
+
+    return 0;
+    
+}
